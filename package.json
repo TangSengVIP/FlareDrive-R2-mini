@@ -8,8 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "check": "tsc -b --noEmit",
-    "autopush": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/auto-push.ps1"
+    "check": "tsc -b --noEmit"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.86.0",

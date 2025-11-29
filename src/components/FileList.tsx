@@ -45,7 +45,7 @@ export const FileList: React.FC<FileListProps> = ({ files, onDownloadStart }) =>
                   const platform = DownloadManager.categorizePlatform(file.name)
                   const label = platform === 'macos' ? 'macOS' : platform === 'windows' ? 'Windows' : platform === 'android' ? 'Android' : null
                   const color = platform === 'macos' ? 'text-blue-600 bg-blue-50' : platform === 'windows' ? 'text-green-600 bg-green-50' : platform === 'android' ? 'text-amber-600 bg-amber-50' : ''
-                  const arch = platform === 'macos' ? DownloadManager.macArchLabel(file.name) : null
+                  const arch = platform === 'macos' ? DownloadManager.macArchLabel(file.path || file.name) : null
                   return (
                     <>
                       {label && (
