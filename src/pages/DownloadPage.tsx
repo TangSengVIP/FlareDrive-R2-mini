@@ -121,6 +121,7 @@ export const DownloadPage: React.FC = () => {
             </div>
           </div>
         </div>
+        <div className="mt-12 text-center text-xs text-gray-500">© 2025 ViewNet, Inc.</div>
       </div>
     </div>
   )
