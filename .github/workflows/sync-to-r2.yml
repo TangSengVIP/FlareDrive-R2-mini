@@ -22,6 +22,29 @@ jobs:
       - name: Checkout (for reference)
         uses: actions/checkout@v4
 
+      - name: Preflight check (validate required secrets)
+        env:
+          GH_SOURCE_TOKEN: ${{ secrets.GH_SOURCE_TOKEN }}
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_BUCKET_NAME: ${{ secrets.R2_BUCKET_NAME }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          SOURCE_REPO: ${{ secrets.GH_SOURCE_REPO }}
+          SOURCE_REPOS: ${{ secrets.GH_SOURCE_REPOS }}
+        run: |
+          set -e
+          missing=0
+          for var in GH_SOURCE_TOKEN R2_ACCOUNT_ID R2_BUCKET_NAME R2_ACCESS_KEY_ID R2_SECRET_ACCESS_KEY; do
+            if [ -z "${!var}" ]; then echo "[ERROR] Missing secret: $var"; missing=1; fi
+          done
+          if [ -z "$SOURCE_REPO" ] && [ -z "$SOURCE_REPOS" ]; then
+            echo "[ERROR] Provide at least one of: GH_SOURCE_REPO or GH_SOURCE_REPOS"; missing=1
+          fi
+          if [ $missing -ne 0 ]; then
+            echo "Secrets validation failed — please add missing secrets in Settings → Secrets and variables → Actions";
+            exit 1
+          fi
+
       - name: Install tools
         run: |
           sudo apt-get update
@@ -83,6 +106,26 @@ jobs:
               echo "Skip non-target asset: $NAME"
               continue
             fi
+            # Repo-specific whitelists
+            ACCEPT=1
+            REPO_NAME="$SOURCE_REPO"
+            if echo "$REPO_NAME" | grep -qi '^chen08209/flclash$'; then
+              if [ "$TARGET_PREFIX" = "windows" ]; then
+                echo "$LOWER" | grep -Eq '^flclash-[0-9]+\.[0-9]+(\.[0-9]+)?-windows-amd64-setup\.exe$' || ACCEPT=0
+              elif [ "$TARGET_PREFIX" = "android" ]; then
+                echo "$LOWER" | grep -Eq 'android-arm64-v8a\.apk$' || ACCEPT=0
+              fi
+            elif echo "$REPO_NAME" | grep -qi '^metacubex/clashmetaforandroid$'; then
+              if [ "$TARGET_PREFIX" = "android" ]; then
+                echo "$LOWER" | grep -Eq 'meta-arm64-v8a-release\.apk$' || ACCEPT=0
+              else
+                ACCEPT=0
+              fi
+            fi
+            if [ $ACCEPT -ne 1 ]; then
+              echo "Skip by whitelist: $NAME"
+              continue
+            fi
             echo "Downloading $NAME -> $TARGET_PREFIX"
             curl -L -H "Authorization: token $GH_TOKEN" -H "Accept: application/octet-stream" \
               "$URL" -o "downloads/$NAME"
@@ -132,6 +175,25 @@ jobs:
                 PLATFORM_PREFIX="android"
               else
                 echo "Skip non-target asset: $NAME"
+                continue
+              fi
+              # Repo-specific whitelists
+              ACCEPT=1
+              if echo "$REPO" | grep -qi '^chen08209/flclash$'; then
+                if [ "$PLATFORM_PREFIX" = "windows" ]; then
+                  echo "$LOWER" | grep -Eq '^flclash-[0-9]+\.[0-9]+(\.[0-9]+)?-windows-amd64-setup\.exe$' || ACCEPT=0
+                elif [ "$PLATFORM_PREFIX" = "android" ]; then
+                  echo "$LOWER" | grep -Eq 'android-arm64-v8a\.apk$' || ACCEPT=0
+                fi
+              elif echo "$REPO" | grep -qi '^metacubex/clashmetaforandroid$'; then
+                if [ "$PLATFORM_PREFIX" = "android" ]; then
+                  echo "$LOWER" | grep -Eq 'meta-arm64-v8a-release\.apk$' || ACCEPT=0
+                else
+                  ACCEPT=0
+                fi
+              fi
+              if [ $ACCEPT -ne 1 ]; then
+                echo "Skip by whitelist: $NAME"
                 continue
               fi
               DEST_PREFIX="$PLATFORM_PREFIX"

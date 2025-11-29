@@ -5,10 +5,12 @@ import { FileService } from '../services/fileService'
 import { MockFileService } from '../services/mockFileService'
 import { FileItem } from '../types'
 import { useDownloadStore } from '../stores/downloadStore'
+import { DownloadManager } from '../utils/downloadUtils'
 
 export const DownloadPage: React.FC = () => {
   const { files, setFiles, setLoading, setError } = useDownloadStore()
   const [isLoading, setIsLoading] = useState(false)
+  const [activePlatform, setActivePlatform] = useState<'macos' | 'windows' | 'android'>('macos')
 
   useEffect(() => {
     loadFiles()
@@ -72,8 +74,34 @@ export const DownloadPage: React.FC = () => {
         <div className="grid grid-cols-1 gap-8">
           <div>
             <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+              {/* Platform Tabs */}
+              <div className="px-6 py-4 border-b border-gray-200">
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => setActivePlatform('macos')}
+                    className={`px-4 py-2 text-sm font-medium rounded-md border ${activePlatform === 'macos' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
+                  >
+                    macOS
+                  </button>
+                  <button
+                    onClick={() => setActivePlatform('windows')}
+                    className={`px-4 py-2 text-sm font-medium rounded-md border ${activePlatform === 'windows' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
+                  >
+                    Windows
+                  </button>
+                  <button
+                    onClick={() => setActivePlatform('android')}
+                    className={`px-4 py-2 text-sm font-medium rounded-md border ${activePlatform === 'android' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
+                  >
+                    Android
+                  </button>
+                </div>
+              </div>
               <div className="px-6 py-4">
-                <FileList files={files} onDownloadStart={handleDownloadStart} />
+                {(() => {
+                  const visibleFiles = files.filter(f => DownloadManager.categorizePlatform(f.name) === activePlatform)
+                  return <FileList files={visibleFiles} onDownloadStart={handleDownloadStart} />
+                })()}
               </div>
             </div>
           </div>
