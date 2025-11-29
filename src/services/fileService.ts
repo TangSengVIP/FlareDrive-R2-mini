@@ -4,6 +4,7 @@ import { FileItem, DownloadItem } from '../types'
 export class FileService {
   static async getFiles(): Promise<FileItem[]> {
     try {
+      if (!supabase) throw new Error('Supabase not configured')
       const { data, error } = await supabase
         .from('files')
         .select('*')
@@ -19,6 +20,7 @@ export class FileService {
 
   static async createDownload(fileId: string): Promise<DownloadItem> {
     try {
+      if (!supabase) throw new Error('Supabase not configured')
       const { data, error } = await supabase
         .from('downloads')
         .insert({
@@ -39,6 +41,7 @@ export class FileService {
 
   static async updateDownloadProgress(downloadId: string, progress: number, status: string): Promise<void> {
     try {
+      if (!supabase) throw new Error('Supabase not configured')
       const { error } = await supabase
         .from('downloads')
         .update({ 
@@ -57,6 +60,7 @@ export class FileService {
 
   static async getDownloadUrl(fileId: string): Promise<string> {
     try {
+      if (!supabase) throw new Error('Supabase not configured')
       const { data, error } = await supabase
         .from('files')
         .select('path')
