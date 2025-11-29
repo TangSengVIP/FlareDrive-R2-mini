@@ -106,18 +106,25 @@ export class MockFileService {
     const file = fileList.find(f => f.id === fileId)
     if (!file) throw new Error('File not found')
 
-    // Prefer Cloudflare R2 public bucket URL if provided
     const pub = import.meta.env.VITE_PUBURL as string | undefined
     const key = file.path || file.name
-    if (pub && typeof pub === 'string') {
-      try {
-        const base = pub.endsWith('/') ? pub.slice(0, -1) : pub
-        const head = await fetch(`${base}/${key}`, { method: 'HEAD' })
-        if (head.ok) return `${base}/${key}`
-      } catch (_) {}
+
+    // Use proxy when cross-origin or no public URL to avoid CORS/preflight issues
+    if (!pub || (pub && new URL(pub).host !== window.location.host)) {
+      if (key) {
+        const u = new URL('/api/download', window.location.origin)
+        u.searchParams.set('key', key)
+        return u.toString()
+      }
     }
 
-    // Fallback to Pages Function proxy to avoid public bucket issues
+    // Same-origin public URL
+    if (pub && key) {
+      const base = pub.endsWith('/') ? pub.slice(0, -1) : pub
+      return `${base}/${key}`
+    }
+
+    // Final fallback: blob URL for local testing
     if (key) {
       const u = new URL('/api/download', window.location.origin)
       u.searchParams.set('key', key)
