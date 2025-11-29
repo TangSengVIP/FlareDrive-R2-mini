@@ -66,12 +66,29 @@ jobs:
             _jq() { echo ${row} | base64 -d | jq -r ${1}; }
             NAME=$(_jq '.name')
             URL=$(_jq '.browser_download_url')
-            echo "Downloading $NAME"
+            LOWER=$(echo "$NAME" | tr '[:upper:]' '[:lower:]')
+            TARGET_PREFIX=""
+            # Platform filter
+            if echo "$LOWER" | grep -E '\.(exe|msi)$' >/dev/null; then
+              TARGET_PREFIX="windows"
+            elif echo "$LOWER" | grep -E '\.(dmg|pkg)$' >/dev/null; then
+              if echo "$LOWER" | grep -E '(arm64|aarch64|apple|silicon|m1|m2|m3)' >/dev/null; then
+                TARGET_PREFIX="macos/apple"
+              else
+                TARGET_PREFIX="macos/intel"
+              fi
+            elif echo "$LOWER" | grep -E '\.(apk|aab)$' >/dev/null; then
+              TARGET_PREFIX="android"
+            else
+              echo "Skip non-target asset: $NAME"
+              continue
+            fi
+            echo "Downloading $NAME -> $TARGET_PREFIX"
             curl -L -H "Authorization: token $GH_TOKEN" -H "Accept: application/octet-stream" \
               "$URL" -o "downloads/$NAME"
+            aws s3 cp "downloads/$NAME" "s3://$R2_BUCKET/$TARGET_PREFIX/$NAME" --endpoint-url "$R2_ENDPOINT"
           done
-          aws s3 cp downloads/ s3://$R2_BUCKET/ --recursive --endpoint-url "$R2_ENDPOINT"
-          aws s3 ls s3://$R2_BUCKET/ --endpoint-url "$R2_ENDPOINT" || true
+          aws s3 ls s3://$R2_BUCKET/ --recursive --endpoint-url "$R2_ENDPOINT" || true
 
       - name: Resolve & download assets for multiple repos
         if: env.SOURCE_REPOS != ''
@@ -101,15 +118,31 @@ jobs:
               _jq() { echo ${row} | base64 -d | jq -r ${1}; }
               NAME=$(_jq '.name')
               URL=$(_jq '.browser_download_url')
-              echo "Downloading $NAME"
+              LOWER=$(echo "$NAME" | tr '[:upper:]' '[:lower:]')
+              PLATFORM_PREFIX=""
+              if echo "$LOWER" | grep -E '\.(exe|msi)$' >/dev/null; then
+                PLATFORM_PREFIX="windows"
+              elif echo "$LOWER" | grep -E '\.(dmg|pkg)$' >/dev/null; then
+                if echo "$LOWER" | grep -E '(arm64|aarch64|apple|silicon|m1|m2|m3)' >/dev/null; then
+                  PLATFORM_PREFIX="macos/apple"
+                else
+                  PLATFORM_PREFIX="macos/intel"
+                fi
+              elif echo "$LOWER" | grep -E '\.(apk|aab)$' >/dev/null; then
+                PLATFORM_PREFIX="android"
+              else
+                echo "Skip non-target asset: $NAME"
+                continue
+              fi
+              DEST_PREFIX="$PLATFORM_PREFIX"
+              if [ -n "$PREFIX" ]; then
+                DEST_PREFIX="$PREFIX/$PLATFORM_PREFIX"
+              fi
+              echo "Downloading $NAME -> $DEST_PREFIX"
               curl -L -H "Authorization: token $GH_TOKEN" -H "Accept: application/octet-stream" \
                 "$URL" -o "downloads/$NAME"
+              aws s3 cp "downloads/$NAME" "s3://$R2_BUCKET/$DEST_PREFIX/$NAME" --endpoint-url "$R2_ENDPOINT"
             done
-            TARGET="s3://$R2_BUCKET/"
-            if [ -n "$PREFIX" ]; then
-              TARGET="s3://$R2_BUCKET/$PREFIX/"
-            fi
-            aws s3 cp downloads/ "$TARGET" --recursive --endpoint-url "$R2_ENDPOINT"
             rm -rf downloads
           done
           aws s3 ls s3://$R2_BUCKET/ --recursive --endpoint-url "$R2_ENDPOINT" || true
