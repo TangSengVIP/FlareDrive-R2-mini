@@ -108,10 +108,20 @@ export class MockFileService {
 
     // Prefer Cloudflare R2 public bucket URL if provided
     const pub = import.meta.env.VITE_PUBURL as string | undefined
+    const key = file.path || file.name
     if (pub && typeof pub === 'string') {
-      const base = pub.endsWith('/') ? pub.slice(0, -1) : pub
-      const key = file.path || file.name
-      return `${base}/${key}`
+      try {
+        const base = pub.endsWith('/') ? pub.slice(0, -1) : pub
+        const head = await fetch(`${base}/${key}`, { method: 'HEAD' })
+        if (head.ok) return `${base}/${key}`
+      } catch (_) {}
+    }
+
+    // Fallback to Pages Function proxy to avoid public bucket issues
+    if (key) {
+      const u = new URL('/api/download', window.location.origin)
+      u.searchParams.set('key', key)
+      return u.toString()
     }
 
     // Fallback: create a temporary blob URL for local testing
