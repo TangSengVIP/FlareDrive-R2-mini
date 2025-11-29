@@ -41,24 +41,45 @@ const mockFiles: FileItem[] = [
 
 export class MockFileService {
   static async getFiles(): Promise<FileItem[]> {
-    // Try to load from public files.json for Cloudflare Pages compatibility
+    // Priority 1: Pages Functions API (auto list R2 when bound)
     try {
-      await new Promise(resolve => setTimeout(resolve, 200))
+      const apiRes = await fetch('/api/files')
+      if (apiRes.ok) {
+        const files = await apiRes.json() as FileItem[]
+        if (Array.isArray(files) && files.length >= 0) return files
+      }
+    } catch (_) {}
+
+    // Priority 2: Static public/files.json
+    try {
       const res = await fetch('/files.json')
-      if (!res.ok) throw new Error('files.json not found')
-      const list = await res.json() as Array<{ id?: string; name: string; size?: number; path: string }>
-      return list.map((item, idx) => ({
-        id: item.id ?? String(idx + 1),
-        name: item.name,
-        size: item.size ?? 0,
-        path: item.path,
-        created_at: new Date().toISOString()
-      }))
-    } catch (e) {
-      // Fallback to built-in mock list
-      await new Promise(resolve => setTimeout(resolve, 200))
-      return mockFiles
-    }
+      if (res.ok) {
+        const list = await res.json() as Array<{ id?: string; name?: string; size?: number; path: string }>
+        const pub = import.meta.env.VITE_PUBURL as string | undefined
+        return await Promise.all(list.map(async (item, idx) => {
+          const derivedName = item.name ?? (item.path.split('/').pop() ?? item.path)
+          let size = item.size ?? 0
+          if ((!size || size === 0) && pub) {
+            try {
+              const base = pub.endsWith('/') ? pub.slice(0, -1) : pub
+              const head = await fetch(`${base}/${item.path}`, { method: 'HEAD' })
+              const length = head.headers.get('content-length')
+              if (length) size = Number(length)
+            } catch (_) {}
+          }
+          return {
+            id: item.id ?? String(idx + 1),
+            name: derivedName,
+            size,
+            path: item.path,
+            created_at: new Date().toISOString()
+          } as FileItem
+        }))
+      }
+    } catch (_) {}
+
+    // Priority 3: Built-in mock list
+    return mockFiles
   }
 
   static async createDownload(fileId: string): Promise<DownloadItem> {
