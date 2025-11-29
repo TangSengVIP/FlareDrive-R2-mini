@@ -7,6 +7,11 @@
 - 安装依赖：`npm i`
 - 运行开发：`npm run dev`
 
+### 自动推送到 GitHub（可选）
+- 启动自动同步：`npm run autopush`
+- 每 10 秒检测一次变更；有变更则自动执行 `git add -A && git commit && git push`，提交信息为 `chore: 自动同步 <时间戳>`。
+- 请确保已配置远程仓库与分支（已完成 `git remote add origin ...` 与 `git branch -M main`）。
+
 ## 配置 Cloudflare Pages + R2 公共桶
 
 1. Fork 或推送到 GitHub

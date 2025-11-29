@@ -127,4 +127,11 @@ export class DownloadManager {
     if (ext === 'apk' || ext === 'aab') return 'android'
     return 'other'
   }
+
+  static macArchLabel(nameOrPath: string): 'Apple M CPU' | 'Intel CPU' | null {
+    const s = nameOrPath.toLowerCase()
+    if (/(arm64|aarch64|apple|silicon|m1|m2|m3)/.test(s)) return 'Apple M CPU'
+    if (/(x64|x86_64|amd64|intel)/.test(s)) return 'Intel CPU'
+    return null
+  }
 }
