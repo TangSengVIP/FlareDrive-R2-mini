@@ -116,6 +116,9 @@ export class DownloadManager {
 
   static categorizePlatform(nameOrPath: string): 'macos' | 'windows' | 'android' | 'other' {
     const name = nameOrPath.toLowerCase()
+    if (/(^|\/)macos(\/|$)/.test(name)) return 'macos'
+    if (/(^|\/)windows(\/|$)/.test(name)) return 'windows'
+    if (/(^|\/)android(\/|$)/.test(name)) return 'android'
     const ext = (() => {
       if (name.endsWith('.tar.gz')) return 'tar.gz'
       const i = name.lastIndexOf('.')

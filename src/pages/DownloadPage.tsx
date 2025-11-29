@@ -67,6 +67,7 @@ export const DownloadPage: React.FC = () => {
             <Cloud className="h-12 w-12 text-blue-600 mr-3" />
             <h1 className="text-3xl font-bold text-gray-900">用户下载中心</h1>
           </div>
+          <p className="text-sm text-gray-600">好网即来，畅享极速下载</p>
           
         </div>
 
@@ -76,30 +77,44 @@ export const DownloadPage: React.FC = () => {
             <div className="bg-white rounded-lg shadow-sm border border-gray-200">
               {/* Platform Tabs */}
               <div className="px-6 py-4 border-b border-gray-200">
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={() => setActivePlatform('macos')}
-                    className={`px-4 py-2 text-sm font-medium rounded-md border ${activePlatform === 'macos' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
-                  >
-                    macOS
-                  </button>
-                  <button
-                    onClick={() => setActivePlatform('windows')}
-                    className={`px-4 py-2 text-sm font-medium rounded-md border ${activePlatform === 'windows' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
-                  >
-                    Windows
-                  </button>
-                  <button
-                    onClick={() => setActivePlatform('android')}
-                    className={`px-4 py-2 text-sm font-medium rounded-md border ${activePlatform === 'android' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
-                  >
-                    Android
-                  </button>
-                </div>
+                {(() => {
+                  const macFiles = files.filter(f => DownloadManager.categorizePlatform(f.path || f.name) === 'macos')
+                  const winFiles = files.filter(f => DownloadManager.categorizePlatform(f.path || f.name) === 'windows')
+                  const androidFiles = files.filter(f => DownloadManager.categorizePlatform(f.path || f.name) === 'android')
+                  return (
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={() => setActivePlatform('macos')}
+                        className={`px-4 py-2 text-sm font-medium rounded-md border ${activePlatform === 'macos' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
+                      >
+                        macOS ({macFiles.length})
+                      </button>
+                      <button
+                        onClick={() => setActivePlatform('windows')}
+                        className={`px-4 py-2 text-sm font-medium rounded-md border ${activePlatform === 'windows' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
+                      >
+                        Windows ({winFiles.length})
+                      </button>
+                      <button
+                        onClick={() => setActivePlatform('android')}
+                        className={`px-4 py-2 text-sm font-medium rounded-md border ${activePlatform === 'android' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
+                      >
+                        Android ({androidFiles.length})
+                      </button>
+                    </div>
+                  )
+                })()}
               </div>
               <div className="px-6 py-4">
                 {(() => {
-                  const visibleFiles = files.filter(f => DownloadManager.categorizePlatform(f.name) === activePlatform)
+                  const visibleFiles = files.filter(f => DownloadManager.categorizePlatform(f.path || f.name) === activePlatform)
+                  if (visibleFiles.length === 0) {
+                    return (
+                      <div className="text-center py-12">
+                        <p className="text-gray-500">当前分类暂无可下载客户端</p>
+                      </div>
+                    )
+                  }
                   return <FileList files={visibleFiles} onDownloadStart={handleDownloadStart} />
                 })()}
               </div>
