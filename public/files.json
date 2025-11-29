@@ -1,0 +1,20 @@
+[
+  {
+    "id": "1",
+    "name": "示例文档.pdf",
+    "size": 1048576,
+    "path": "documents/sample-document.pdf"
+  },
+  {
+    "id": "2",
+    "name": "项目模板.zip",
+    "size": 5242880,
+    "path": "templates/project-template.zip"
+  },
+  {
+    "id": "3",
+    "name": "用户手册.docx",
+    "size": 2097152,
+    "path": "manuals/user-manual.docx"
+  }
+]
