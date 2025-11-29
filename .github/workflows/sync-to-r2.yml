@@ -115,6 +115,12 @@ jobs:
               elif [ "$TARGET_PREFIX" = "android" ]; then
                 echo "$LOWER" | grep -Eq 'android-arm64-v8a\.apk$' || ACCEPT=0
               fi
+            elif echo "$REPO_NAME" | grep -qi '^zzzgydi/clash-verge-rev$'; then
+              if [ "$TARGET_PREFIX" = "windows" ]; then
+                echo "$LOWER" | grep -Eq '^clash\.verge_[0-9]+\.[0-9]+\.[0-9]+_x64-setup\.exe$' || ACCEPT=0
+              else
+                ACCEPT=0
+              fi
             elif echo "$REPO_NAME" | grep -qi '^metacubex/clashmetaforandroid$'; then
               if [ "$TARGET_PREFIX" = "android" ]; then
                 echo "$LOWER" | grep -Eq 'meta-arm64-v8a-release\.apk$' || ACCEPT=0
@@ -184,6 +190,12 @@ jobs:
                   echo "$LOWER" | grep -Eq '^flclash-[0-9]+\.[0-9]+(\.[0-9]+)?-windows-amd64-setup\.exe$' || ACCEPT=0
                 elif [ "$PLATFORM_PREFIX" = "android" ]; then
                   echo "$LOWER" | grep -Eq 'android-arm64-v8a\.apk$' || ACCEPT=0
+                fi
+              elif echo "$REPO" | grep -qi '^zzzgydi/clash-verge-rev$'; then
+                if [ "$PLATFORM_PREFIX" = "windows" ]; then
+                  echo "$LOWER" | grep -Eq '^clash\.verge_[0-9]+\.[0-9]+\.[0-9]+_x64-setup\.exe$' || ACCEPT=0
+                else
+                  ACCEPT=0
                 fi
               elif echo "$REPO" | grep -qi '^metacubex/clashmetaforandroid$'; then
                 if [ "$PLATFORM_PREFIX" = "android" ]; then
