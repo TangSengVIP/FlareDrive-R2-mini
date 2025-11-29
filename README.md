@@ -62,4 +62,10 @@
 可选输入参数：
 - `tag`：指定 Release tag；留空则同步最新 Release。
 
+多项目示例（在 `GH_SOURCE_REPOS` 中填写）：
+
+```
+chen08209/FlClash|flclash;MetaCubeX/ClashMetaForAndroid|cmfa;clash-verge-rev/clash-verge-rev|clash-verge-rev
+```
+
 同步后，Pages 前端会从 R2 根目录直接读取文件（通过 `/api/files` 或 `files.json`），页面刷新即可显示最新内容。
