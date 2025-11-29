@@ -37,9 +37,19 @@ export const FileList: React.FC<FileListProps> = ({ files, onDownloadStart }) =>
               >
                 {file.name}
               </h3>
-              <p className="text-sm text-gray-500 mt-1">
-                {DownloadManager.formatFileSize(file.size)}
-              </p>
+              <div className="mt-1 flex items-center gap-2">
+                <p className="text-sm text-gray-500">
+                  {DownloadManager.formatFileSize(file.size)}
+                </p>
+                {(() => {
+                  const platform = DownloadManager.categorizePlatform(file.name)
+                  const label = platform === 'macos' ? 'macOS' : platform === 'windows' ? 'Windows' : platform === 'android' ? 'Android' : null
+                  const color = platform === 'macos' ? 'text-blue-600 bg-blue-50' : platform === 'windows' ? 'text-green-600 bg-green-50' : platform === 'android' ? 'text-amber-600 bg-amber-50' : ''
+                  return label ? (
+                    <span className={`inline-flex items-center px-2 py-0.5 text-xs rounded ${color}`}>{label}</span>
+                  ) : null
+                })()}
+              </div>
             </div>
             <div className="ml-4 flex-shrink-0">
               <button

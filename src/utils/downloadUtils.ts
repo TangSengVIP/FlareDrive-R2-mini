@@ -113,4 +113,18 @@ export class DownloadManager {
   static formatProgress(progress: number): string {
     return `${Math.round(progress)}%`
   }
+
+  static categorizePlatform(nameOrPath: string): 'macos' | 'windows' | 'android' | 'other' {
+    const name = nameOrPath.toLowerCase()
+    const ext = (() => {
+      if (name.endsWith('.tar.gz')) return 'tar.gz'
+      const i = name.lastIndexOf('.')
+      return i >= 0 ? name.slice(i + 1) : ''
+    })()
+
+    if (ext === 'dmg' || ext === 'pkg' || ext === 'app' || ext === 'tar.gz') return 'macos'
+    if (ext === 'exe' || ext === 'msi') return 'windows'
+    if (ext === 'apk' || ext === 'aab') return 'android'
+    return 'other'
+  }
 }
