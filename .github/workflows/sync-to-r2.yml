@@ -1,0 +1,79 @@
+name: Sync GitHub Release Assets to Cloudflare R2
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to sync (leave empty for latest)"
+        required: false
+        default: ""
+  schedule:
+    - cron: "0 3 * * *"
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    env:
+      R2_ENDPOINT: https://${{ secrets.R2_ACCOUNT_ID }}.r2.cloudflarestorage.com
+      R2_BUCKET: ${{ secrets.R2_BUCKET_NAME }}
+      SOURCE_REPO: ${{ secrets.GH_SOURCE_REPO }}
+    steps:
+      - name: Checkout (for reference)
+        uses: actions/checkout@v4
+
+      - name: Install tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
+          pipx install awscli
+
+      - name: Configure AWS for R2
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: |
+          aws --version
+          aws configure set aws_access_key_id "$AWS_ACCESS_KEY_ID"
+          aws configure set aws_secret_access_key "$AWS_SECRET_ACCESS_KEY"
+          aws configure set default.region "auto"
+
+      - name: Resolve release (latest or specific tag)
+        env:
+          GH_TOKEN: ${{ secrets.GH_SOURCE_TOKEN }}
+        run: |
+          if [ -z "${{ github.event.inputs.tag }}" ]; then
+            curl -s -H "Authorization: token $GH_TOKEN" \
+              "https://api.github.com/repos/$SOURCE_REPO/releases/latest" > release.json
+          else
+            curl -s -H "Authorization: token $GH_TOKEN" \
+              "https://api.github.com/repos/$SOURCE_REPO/releases/tags/${{ github.event.inputs.tag }}" > release.json
+          fi
+          cat release.json | jq '.tag_name, .name' || true
+
+      - name: Download assets
+        env:
+          GH_TOKEN: ${{ secrets.GH_SOURCE_TOKEN }}
+        run: |
+          mkdir -p downloads
+          ASSET_COUNT=$(jq '.assets | length' release.json)
+          echo "Found $ASSET_COUNT assets"
+          for row in $(jq -r '.assets[] | @base64' release.json); do
+            _jq() { echo ${row} | base64 -d | jq -r ${1}; }
+            NAME=$(_jq '.name')
+            URL=$(_jq '.browser_download_url')
+            echo "Downloading $NAME"
+            # Use Accept header to force binary download (works for private assets too)
+            curl -L -H "Authorization: token $GH_TOKEN" -H "Accept: application/octet-stream" \
+              "$URL" -o "downloads/$NAME"
+          done
+          ls -al downloads || true
+
+      - name: Upload to R2 bucket (root path)
+        run: |
+          aws s3 cp downloads/ s3://$R2_BUCKET/ --recursive \
+            --endpoint-url "$R2_ENDPOINT"
+
+      - name: List bucket for verification
+        run: |
+          aws s3 ls s3://$R2_BUCKET/ --endpoint-url "$R2_ENDPOINT" || true
+

@@ -45,3 +45,20 @@
 
 > 路径约定：若所有文件都存放在桶根目录，`files.json` 的 `path` 可省略，此时将使用 `name` 作为对象键。大小缺省时会通过对 `${VITE_PUBURL}/{key}` 发送 `HEAD` 请求自动获取 `Content-Length`。
 - `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY`：可选，若不配置则使用静态 `files.json`
+## 自动从 GitHub 同步到 R2（CI）
+
+本仓库内置 GitHub Actions 工作流程，将指定仓库的最新 Release 资产自动拉取并上传到 R2 桶根目录。
+
+- 工作流：`.github/workflows/sync-to-r2.yml`
+- 触发：手动（workflow_dispatch）或每天 03:00（可调整）
+- 所需 Secrets（在 GitHub 仓库 Settings → Secrets and variables → Actions 配置）：
+  - `GH_SOURCE_REPO`：来源仓库（如 `owner/repo`）
+  - `GH_SOURCE_TOKEN`：GitHub PAT，至少授予 `repo` 权限（若来源仓库为公开，仅 Release 资产下载通常也需要 token 以提升速率和避免限制）
+  - `R2_ACCOUNT_ID`：Cloudflare 账户 ID（用于 S3 兼容端点）
+  - `R2_BUCKET_NAME`：目标 R2 桶名
+  - `R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY`：R2 访问密钥对（从 R2 控制台创建）
+
+可选输入参数：
+- `tag`：指定 Release tag；留空则同步最新 Release。
+
+同步后，Pages 前端会从 R2 根目录直接读取文件（通过 `/api/files` 或 `files.json`），页面刷新即可显示最新内容。
