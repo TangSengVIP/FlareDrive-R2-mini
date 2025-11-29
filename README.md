@@ -42,4 +42,6 @@
 
 - `VITE_PUBURL`：Cloudflare R2 公共桶 URL，用于生成下载链接
 - （可选）`BUCKET`：Cloudflare Pages R2 绑定变量名，启用自动列表 `/api/files`
+
+> 路径约定：若所有文件都存放在桶根目录，`files.json` 的 `path` 可省略，此时将使用 `name` 作为对象键。大小缺省时会通过对 `${VITE_PUBURL}/{key}` 发送 `HEAD` 请求自动获取 `Content-Length`。
 - `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY`：可选，若不配置则使用静态 `files.json`

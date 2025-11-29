@@ -54,24 +54,25 @@ export class MockFileService {
     try {
       const res = await fetch('/files.json')
       if (res.ok) {
-        const list = await res.json() as Array<{ id?: string; name?: string; size?: number; path: string }>
+        const list = await res.json() as Array<{ id?: string; name?: string; size?: number; path?: string }>
         const pub = import.meta.env.VITE_PUBURL as string | undefined
         return await Promise.all(list.map(async (item, idx) => {
-          const derivedName = item.name ?? (item.path.split('/').pop() ?? item.path)
+          const baseName = item.name ?? (item.path ? (item.path.split('/').pop() ?? item.path) : '')
+          const key = item.path ?? baseName
           let size = item.size ?? 0
-          if ((!size || size === 0) && pub) {
+          if ((!size || size === 0) && pub && key) {
             try {
               const base = pub.endsWith('/') ? pub.slice(0, -1) : pub
-              const head = await fetch(`${base}/${item.path}`, { method: 'HEAD' })
+              const head = await fetch(`${base}/${key}`, { method: 'HEAD' })
               const length = head.headers.get('content-length')
               if (length) size = Number(length)
             } catch (_) {}
           }
           return {
             id: item.id ?? String(idx + 1),
-            name: derivedName,
+            name: baseName || key,
             size,
-            path: item.path,
+            path: key,
             created_at: new Date().toISOString()
           } as FileItem
         }))
@@ -109,7 +110,8 @@ export class MockFileService {
     const pub = import.meta.env.VITE_PUBURL as string | undefined
     if (pub && typeof pub === 'string') {
       const base = pub.endsWith('/') ? pub.slice(0, -1) : pub
-      return `${base}/${file.path}`
+      const key = file.path || file.name
+      return `${base}/${key}`
     }
 
     // Fallback: create a temporary blob URL for local testing
