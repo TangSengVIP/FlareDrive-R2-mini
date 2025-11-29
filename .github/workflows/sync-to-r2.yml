@@ -115,7 +115,7 @@ jobs:
               elif [ "$TARGET_PREFIX" = "android" ]; then
                 echo "$LOWER" | grep -Eq 'android-arm64-v8a\.apk$' || ACCEPT=0
               fi
-            elif echo "$REPO_NAME" | grep -qi '^zzzgydi/clash-verge-rev$'; then
+            elif echo "$REPO_NAME" | grep -qi '^zzzgydi/clash-verge-rev$' || echo "$REPO_NAME" | grep -qi '^clash-verge-rev/clash-verge-rev$'; then
               if [ "$TARGET_PREFIX" = "windows" ]; then
                 echo "$LOWER" | grep -Eq '^clash\.verge_[0-9]+\.[0-9]+\.[0-9]+_x64-setup\.exe$' || ACCEPT=0
               else
@@ -191,7 +191,7 @@ jobs:
                 elif [ "$PLATFORM_PREFIX" = "android" ]; then
                   echo "$LOWER" | grep -Eq 'android-arm64-v8a\.apk$' || ACCEPT=0
                 fi
-              elif echo "$REPO" | grep -qi '^zzzgydi/clash-verge-rev$'; then
+              elif echo "$REPO" | grep -qi '^zzzgydi/clash-verge-rev$' || echo "$REPO" | grep -qi '^clash-verge-rev/clash-verge-rev$'; then
                 if [ "$PLATFORM_PREFIX" = "windows" ]; then
                   echo "$LOWER" | grep -Eq '^clash\.verge_[0-9]+\.[0-9]+\.[0-9]+_x64-setup\.exe$' || ACCEPT=0
                 else
