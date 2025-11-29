@@ -118,7 +118,7 @@ jobs:
             elif echo "$REPO_NAME" | grep -qi '^zzzgydi/clash-verge-rev$' || echo "$REPO_NAME" | grep -qi '^clash-verge-rev/clash-verge-rev$'; then
               if [ "$TARGET_PREFIX" = "windows" ]; then
                 echo "$LOWER" | grep -Eq '^clash\.verge_[0-9]+\.[0-9]+\.[0-9]+_x64-setup\.exe$' || ACCEPT=0
-              elif [ "$TARGET_PREFIX" = "macos/apple" ] || [ "$TARGET_PREFIX" = "macos/intel" ]; then
+              elif echo "$TARGET_PREFIX" | grep -q '^macos'; then
                 echo "$LOWER" | grep -Eq '\.(dmg|pkg)$' || ACCEPT=0
               else
                 ACCEPT=0
@@ -196,7 +196,7 @@ jobs:
               elif echo "$REPO" | grep -qi '^zzzgydi/clash-verge-rev$' || echo "$REPO" | grep -qi '^clash-verge-rev/clash-verge-rev$'; then
                 if [ "$PLATFORM_PREFIX" = "windows" ]; then
                   echo "$LOWER" | grep -Eq '^clash\.verge_[0-9]+\.[0-9]+\.[0-9]+_x64-setup\.exe$' || ACCEPT=0
-                elif [ "$PLATFORM_PREFIX" = "macos/apple" ] || [ "$PLATFORM_PREFIX" = "macos/intel" ]; then
+                elif echo "$PLATFORM_PREFIX" | grep -q '^macos'; then
                   echo "$LOWER" | grep -Eq '\.(dmg|pkg)$' || ACCEPT=0
                 else
                   ACCEPT=0
