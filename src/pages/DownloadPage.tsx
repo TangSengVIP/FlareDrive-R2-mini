@@ -81,26 +81,29 @@ export const DownloadPage: React.FC = () => {
                   const macFiles = files.filter(f => DownloadManager.categorizePlatform(f.path || f.name) === 'macos')
                   const winFiles = files.filter(f => DownloadManager.categorizePlatform(f.path || f.name) === 'windows')
                   const androidFiles = files.filter(f => DownloadManager.categorizePlatform(f.path || f.name) === 'android')
+                  const baseBtn = 'px-5 py-2 text-sm font-medium rounded-full transition focus:outline-none focus:ring-2 focus:ring-offset-2'
                   return (
-                    <div className="flex items-center gap-3">
-                      <button
-                        onClick={() => setActivePlatform('macos')}
-                        className={`px-4 py-2 text-sm font-medium rounded-md border ${activePlatform === 'macos' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
-                      >
-                        macOS ({macFiles.length})
-                      </button>
-                      <button
-                        onClick={() => setActivePlatform('windows')}
-                        className={`px-4 py-2 text-sm font-medium rounded-md border ${activePlatform === 'windows' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
-                      >
-                        Windows ({winFiles.length})
-                      </button>
-                      <button
-                        onClick={() => setActivePlatform('android')}
-                        className={`px-4 py-2 text-sm font-medium rounded-md border ${activePlatform === 'android' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
-                      >
-                        Android ({androidFiles.length})
-                      </button>
+                    <div className="flex items-center justify-center">
+                      <div className="bg-gray-50 rounded-full p-1 border border-gray-200 inline-flex gap-1">
+                        <button
+                          onClick={() => setActivePlatform('macos')}
+                          className={`${baseBtn} ${activePlatform === 'macos' ? 'bg-blue-600 text-white ring-blue-500' : 'bg-white text-gray-700 hover:bg-gray-100'}`}
+                        >
+                          macOS ({macFiles.length})
+                        </button>
+                        <button
+                          onClick={() => setActivePlatform('windows')}
+                          className={`${baseBtn} ${activePlatform === 'windows' ? 'bg-blue-600 text-white ring-blue-500' : 'bg-white text-gray-700 hover:bg-gray-100'}`}
+                        >
+                          Windows ({winFiles.length})
+                        </button>
+                        <button
+                          onClick={() => setActivePlatform('android')}
+                          className={`${baseBtn} ${activePlatform === 'android' ? 'bg-blue-600 text-white ring-blue-500' : 'bg-white text-gray-700 hover:bg-gray-100'}`}
+                        >
+                          Android ({androidFiles.length})
+                        </button>
+                      </div>
                     </div>
                   )
                 })()}
