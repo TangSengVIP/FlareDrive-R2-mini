@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Cloud, Apple, Laptop, Smartphone } from 'lucide-react'
+import { Cloud, Apple, Laptop, Smartphone, Cpu } from 'lucide-react'
 import { FileList } from '../components/FileList'
 import { FileService } from '../services/fileService'
 import { MockFileService } from '../services/mockFileService'
@@ -11,6 +11,7 @@ export const DownloadPage: React.FC = () => {
   const { files, setFiles, setLoading, setError, isLoading: storeLoading } = useDownloadStore()
   const [isLoading, setIsLoading] = useState(false)
   const [activePlatform, setActivePlatform] = useState<'macos' | 'windows' | 'android'>('macos')
+  const [macSub, setMacSub] = useState<'apple' | 'intel'>('apple')
 
   useEffect(() => {
     loadFiles()
@@ -114,7 +115,16 @@ export const DownloadPage: React.FC = () => {
               <div className="px-6 py-4">
                 {(() => {
                   const loading = storeLoading || isLoading
-                  const visibleFiles = files.filter(f => DownloadManager.categorizePlatform(f.path || f.name) === activePlatform)
+                  let visibleFiles = files.filter(f => DownloadManager.categorizePlatform(f.path || f.name) === activePlatform)
+                  // macOS sub-filter
+                  if (activePlatform === 'macos') {
+                    visibleFiles = visibleFiles.filter(f => {
+                      const arch = DownloadManager.macArchLabel(f.path || f.name)
+                      if (macSub === 'apple') return arch === 'Apple M CPU'
+                      if (macSub === 'intel') return arch === 'Intel CPU'
+                      return true
+                    })
+                  }
                   if (loading) {
                     return (
                       <div className="space-y-3">
@@ -124,6 +134,36 @@ export const DownloadPage: React.FC = () => {
                             <div className="h-3 bg-gray-200 rounded w-1/5"></div>
                           </div>
                         ))}
+                      </div>
+                    )
+                  }
+                  // macOS sub tabs
+                  if (activePlatform === 'macos') {
+                    return (
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-center">
+                          <div className="bg-gray-50 rounded-full p-1 border border-gray-200 inline-flex gap-1">
+                            <button
+                              onClick={() => setMacSub('apple')}
+                              className={`px-4 py-1.5 text-xs font-medium rounded-full inline-flex items-center gap-2 ${macSub === 'apple' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100'}`}
+                            >
+                              <Apple className="h-3.5 w-3.5" /> Apple M CPU
+                            </button>
+                            <button
+                              onClick={() => setMacSub('intel')}
+                              className={`px-4 py-1.5 text-xs font-medium rounded-full inline-flex items-center gap-2 ${macSub === 'intel' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100'}`}
+                            >
+                              <Cpu className="h-3.5 w-3.5" /> Intel CPU
+                            </button>
+                          </div>
+                        </div>
+                        {visibleFiles.length === 0 ? (
+                          <div className="text-center py-12">
+                            <p className="text-gray-500">当前子分类暂无可下载客户端</p>
+                          </div>
+                        ) : (
+                          <FileList files={visibleFiles} onDownloadStart={handleDownloadStart} />
+                        )}
                       </div>
                     )
                   }

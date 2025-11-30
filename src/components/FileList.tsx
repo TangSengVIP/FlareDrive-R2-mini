@@ -67,7 +67,15 @@ export const FileList: React.FC<FileListProps> = ({ files, onDownloadStart }) =>
                         <span className={`inline-flex items-center px-2 py-0.5 text-xs rounded ${arch === 'Apple M CPU' ? 'text-purple-700 bg-purple-50' : 'text-gray-700 bg-gray-100'}`}>{arch}</span>
                       )}
                       {brand && (
-                        <span className="inline-flex items-center px-2 py-0.5 text-xs rounded text-sky-700 bg-sky-50">{brand}</span>
+                        <a
+                          href={brand === 'FlClash' ? 'https://github.com/chen08209/FlClash' : brand === 'Clash Verge' ? 'https://github.com/clash-verge-rev/clash-verge-rev' : 'https://github.com/MetaCubeX/ClashMetaForAndroid'}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center px-2 py-0.5 text-xs rounded text-sky-700 bg-sky-50 hover:bg-sky-100"
+                          title={`查看 ${brand} 项目说明`}
+                        >
+                          {brand}
+                        </a>
                       )}
                     </>
                   )
