@@ -202,7 +202,7 @@ export const DownloadPage: React.FC = () => {
           </div>
         </div>
         </div>
-        <div className="w-full border-t border-gray-200 py-4 text-center text-xs text-gray-500">© 2025 ViewNet, Inc.</div>
+        <div className="w-full border-t border-white/20 py-4 text-center text-xs bg-gray-900/60 text-white backdrop-blur-sm drop-shadow-sm">© 2025 ViewNet, Inc.</div>
       </div>
     </div>
   )
