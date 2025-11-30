@@ -12,16 +12,16 @@ export async function onRequest({ request }: { request: Request }) {
     const results = await Promise.all(tasks)
     const urls: string[] = results
       .flatMap(d => (d.images || []))
-      .map((img: any) => `https://www.bing.com${img.url}`)
+      .map((img: { url: string }) => `https://www.bing.com${img.url}`)
 
     return new Response(JSON.stringify({ urls }), {
       headers: { 'content-type': 'application/json' }
     })
   } catch (e) {
+    console.error(e)
     return new Response(JSON.stringify({ urls: [] }), {
       headers: { 'content-type': 'application/json' },
       status: 200
     })
   }
 }
-

@@ -1,8 +1,7 @@
 import React from 'react'
-import { X, Pause, Play, Download } from 'lucide-react'
+import { X, Download } from 'lucide-react'
 import { DownloadProgress } from '../types'
 import { DownloadManager } from '../utils/downloadUtils'
-import { useDownloadStore } from '../stores/downloadStore'
 
 interface DownloadManagerProps {
   downloads: DownloadProgress[]

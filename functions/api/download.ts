@@ -21,6 +21,7 @@ export async function onRequest({ request, env }: { request: Request; env: { BUC
 
     return new Response(obj.body, { headers })
   } catch (e) {
+    console.error(e)
     return new Response('Server error', { status: 500 })
   }
 }
@@ -34,4 +35,3 @@ interface R2ObjectBody {
   size?: number
   httpMetadata?: { contentType?: string }
 }
-

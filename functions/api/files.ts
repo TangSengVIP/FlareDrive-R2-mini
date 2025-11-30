@@ -8,7 +8,7 @@ export async function onRequest({ env }: { env: { BUCKET?: R2Bucket } }) {
     }
 
     const listing = await bucket.list({ limit: 1000 })
-    const files = (listing.objects || []).map((obj: any) => ({
+    const files = (listing.objects || []).map((obj) => ({
       id: obj.key,
       name: (obj.key?.split('/')?.pop()) || obj.key,
       size: obj.size ?? 0,
@@ -20,6 +20,7 @@ export async function onRequest({ env }: { env: { BUCKET?: R2Bucket } }) {
       headers: { 'content-type': 'application/json' }
     })
   } catch (e) {
+    console.error(e)
     return new Response(JSON.stringify({ files: [] }), {
       headers: { 'content-type': 'application/json' },
       status: 200

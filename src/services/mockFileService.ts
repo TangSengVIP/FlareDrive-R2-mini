@@ -48,7 +48,7 @@ export class MockFileService {
         const files = await apiRes.json() as FileItem[]
         if (Array.isArray(files) && files.length >= 0) return files
       }
-    } catch (_) {}
+    } catch (err) { console.warn('files api unavailable', err) }
 
     // Priority 2: Static public/files.json
     try {
@@ -66,7 +66,7 @@ export class MockFileService {
               const head = await fetch(`${base}/${key}`, { method: 'HEAD' })
               const length = head.headers.get('content-length')
               if (length) size = Number(length)
-            } catch (_) {}
+            } catch (err) { console.warn('head request failed', err) }
           }
           return {
             id: item.id ?? String(idx + 1),
@@ -77,7 +77,7 @@ export class MockFileService {
           } as FileItem
         }))
       }
-    } catch (_) {}
+    } catch (err) { console.warn('static files list unavailable', err) }
 
     // Priority 3: Built-in mock list
     return mockFiles
