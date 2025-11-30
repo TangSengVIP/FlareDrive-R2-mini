@@ -37,7 +37,7 @@ export const FileList: React.FC<FileListProps> = ({ files, onDownloadStart }) =>
               >
                 {file.name}
               </h3>
-              <div className="mt-1 flex items-center gap-2">
+              <div className="mt-1 flex items-center gap-2 flex-wrap">
                 <p className="text-xs text-gray-600">
                   {DownloadManager.formatFileSize(file.size)}
                 </p>
@@ -46,6 +46,13 @@ export const FileList: React.FC<FileListProps> = ({ files, onDownloadStart }) =>
                   const label = platform === 'macos' ? 'macOS' : platform === 'windows' ? 'Windows' : platform === 'android' ? 'Android' : null
                   const color = platform === 'macos' ? 'text-blue-700 bg-blue-50' : platform === 'windows' ? 'text-green-700 bg-green-50' : platform === 'android' ? 'text-amber-700 bg-amber-50' : ''
                   const arch = platform === 'macos' ? DownloadManager.macArchLabel(file.path || file.name) : null
+                  const brand = (() => {
+                    const p = (file.path || '').toLowerCase()
+                    if (p.includes('flclash')) return 'FlClash'
+                    if (p.includes('clash-verge-rev')) return 'Clash Verge'
+                    if (p.includes('cmfa') || p.includes('clashmetaforandroid')) return 'CMFA'
+                    return null
+                  })()
                   return (
                     <>
                       {label && (
@@ -58,6 +65,9 @@ export const FileList: React.FC<FileListProps> = ({ files, onDownloadStart }) =>
                       )}
                       {arch && (
                         <span className={`inline-flex items-center px-2 py-0.5 text-xs rounded ${arch === 'Apple M CPU' ? 'text-purple-700 bg-purple-50' : 'text-gray-700 bg-gray-100'}`}>{arch}</span>
+                      )}
+                      {brand && (
+                        <span className="inline-flex items-center px-2 py-0.5 text-xs rounded text-sky-700 bg-sky-50">{brand}</span>
                       )}
                     </>
                   )

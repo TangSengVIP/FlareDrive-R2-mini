@@ -8,7 +8,7 @@ import { useDownloadStore } from '../stores/downloadStore'
 import { DownloadManager } from '../utils/downloadUtils'
 
 export const DownloadPage: React.FC = () => {
-  const { files, setFiles, setLoading, setError } = useDownloadStore()
+  const { files, setFiles, setLoading, setError, isLoading: storeLoading } = useDownloadStore()
   const [isLoading, setIsLoading] = useState(false)
   const [activePlatform, setActivePlatform] = useState<'macos' | 'windows' | 'android'>('macos')
 
@@ -59,7 +59,7 @@ export const DownloadPage: React.FC = () => {
   // 下载管理模块已移除，用户点击文件或下载按钮直接下载
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
       <div className="max-w-6xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-8">
@@ -113,7 +113,20 @@ export const DownloadPage: React.FC = () => {
               </div>
               <div className="px-6 py-4">
                 {(() => {
+                  const loading = storeLoading || isLoading
                   const visibleFiles = files.filter(f => DownloadManager.categorizePlatform(f.path || f.name) === activePlatform)
+                  if (loading) {
+                    return (
+                      <div className="space-y-3">
+                        {[1,2,3].map(i => (
+                          <div key={i} className="bg-white rounded-lg border border-gray-200 p-4 animate-pulse">
+                            <div className="h-4 bg-gray-200 rounded w-1/3 mb-3"></div>
+                            <div className="h-3 bg-gray-200 rounded w-1/5"></div>
+                          </div>
+                        ))}
+                      </div>
+                    )
+                  }
                   if (visibleFiles.length === 0) {
                     return (
                       <div className="text-center py-12">
