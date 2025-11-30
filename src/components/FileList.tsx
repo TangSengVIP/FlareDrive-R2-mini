@@ -26,7 +26,7 @@ export const FileList: React.FC<FileListProps> = ({ files, onDownloadStart }) =>
       {files.map((file) => (
         <div
           key={file.id}
-          className="bg-white rounded-lg border border-gray-200 p-4 hover:border-blue-200 hover:shadow transition"
+          className="bg-white/50 backdrop-blur-sm rounded-lg border border-gray-200 p-4 hover:border-blue-200 hover:shadow transition"
         >
           <div className="flex items-center justify-between">
             <div className="flex-1 min-w-0">

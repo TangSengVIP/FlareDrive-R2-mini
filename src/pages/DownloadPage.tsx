@@ -97,7 +97,7 @@ export const DownloadPage: React.FC = () => {
         {/* Main Content */}
         <div className="grid grid-cols-1 gap-8">
           <div>
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div className="bg-white/50 backdrop-blur-sm rounded-lg shadow-sm border border-gray-200">
               {/* Platform Tabs */}
               <div className="px-6 py-4 border-b border-gray-200">
                 {(() => {
@@ -107,7 +107,7 @@ export const DownloadPage: React.FC = () => {
                   const baseBtn = 'px-5 py-2 text-sm font-medium rounded-full transition focus:outline-none focus:ring-2 focus:ring-offset-2 inline-flex items-center gap-2'
                   return (
                     <div className="flex items-center justify-center">
-                      <div className="bg-gray-50 rounded-full p-1 border border-gray-200 inline-flex gap-1">
+                      <div className="bg-white/50 backdrop-blur-sm rounded-full p-1 border border-gray-200 inline-flex gap-1">
                         <button
                           onClick={() => setActivePlatform('macos')}
                           className={`${baseBtn} ${activePlatform === 'macos' ? 'bg-blue-600 text-white ring-blue-500' : 'bg-white text-gray-700 hover:bg-gray-100'}`}
