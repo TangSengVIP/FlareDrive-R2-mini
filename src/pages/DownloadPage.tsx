@@ -60,8 +60,8 @@ export const DownloadPage: React.FC = () => {
   // 下载管理模块已移除，用户点击文件或下载按钮直接下载
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
-      <div className="max-w-6xl mx-auto px-4 py-8">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex flex-col">
+      <div className="max-w-6xl mx-auto px-4 py-8 flex-1">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center mb-4">
@@ -179,8 +179,8 @@ export const DownloadPage: React.FC = () => {
             </div>
           </div>
         </div>
-        <div className="mt-12 text-center text-xs text-gray-500">© 2025 ViewNet, Inc.</div>
       </div>
+      <div className="w-full border-t border-gray-200 py-4 text-center text-xs text-gray-500">© 2025 ViewNet, Inc.</div>
     </div>
   )
 }
