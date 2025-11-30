@@ -19,16 +19,21 @@ export const DownloadPage: React.FC = () => {
     loadFiles()
     ;(async () => {
       try {
-        const res = await fetch('https://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n=8&mkt=zh-CN')
-        const data = await res.json()
-        const urls: string[] = (data.images || []).map((i: any) => `https://www.bing.com${i.url}`)
-        if (urls.length > 0) setBgImages(urls)
+        const promises = Array.from({ length: 20 }).map((_, i) =>
+          fetch(`https://www.bing.com/HPImageArchive.aspx?format=js&idx=${i}&n=1&mkt=zh-CN`)
+            .then(r => r.json())
+            .catch(() => ({ images: [] }))
+        )
+        const results = await Promise.all(promises)
+        const urls: string[] = results
+          .flatMap(d => (d.images || []))
+          .map((i: any) => `https://www.bing.com${i.url}`)
+        if (urls.length > 0) {
+          setBgImages(urls)
+          setBgIndex(Math.floor(Math.random() * urls.length))
+        }
       } catch {}
     })()
-    const timer = setInterval(() => {
-      setBgIndex((prev) => prev + 1)
-    }, 10000)
-    return () => clearInterval(timer)
   }, [])
 
   const loadFiles = async () => {
