@@ -19,15 +19,9 @@ export const DownloadPage: React.FC = () => {
     loadFiles()
     ;(async () => {
       try {
-        const promises = Array.from({ length: 20 }).map((_, i) =>
-          fetch(`https://www.bing.com/HPImageArchive.aspx?format=js&idx=${i}&n=1&mkt=zh-CN`)
-            .then(r => r.json())
-            .catch(() => ({ images: [] }))
-        )
-        const results = await Promise.all(promises)
-        const urls: string[] = results
-          .flatMap(d => (d.images || []))
-          .map((i: any) => `https://www.bing.com${i.url}`)
+        const res = await fetch('/api/bing?count=20&mkt=zh-CN')
+        const data = await res.json()
+        const urls: string[] = Array.isArray(data.urls) ? data.urls : []
         if (urls.length > 0) {
           setBgImages(urls)
           setBgIndex(Math.floor(Math.random() * urls.length))
