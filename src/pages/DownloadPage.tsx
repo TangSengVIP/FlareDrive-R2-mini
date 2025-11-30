@@ -12,9 +12,23 @@ export const DownloadPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [activePlatform, setActivePlatform] = useState<'macos' | 'windows' | 'android'>('macos')
   const [macSub, setMacSub] = useState<'apple' | 'intel'>('apple')
+  const [bgImages, setBgImages] = useState<string[]>([])
+  const [bgIndex, setBgIndex] = useState(0)
 
   useEffect(() => {
     loadFiles()
+    ;(async () => {
+      try {
+        const res = await fetch('https://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n=8&mkt=zh-CN')
+        const data = await res.json()
+        const urls: string[] = (data.images || []).map((i: any) => `https://www.bing.com${i.url}`)
+        if (urls.length > 0) setBgImages(urls)
+      } catch {}
+    })()
+    const timer = setInterval(() => {
+      setBgIndex((prev) => prev + 1)
+    }, 10000)
+    return () => clearInterval(timer)
   }, [])
 
   const loadFiles = async () => {
@@ -60,8 +74,17 @@ export const DownloadPage: React.FC = () => {
   // 下载管理模块已移除，用户点击文件或下载按钮直接下载
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white flex flex-col">
-      <div className="max-w-6xl mx-auto px-4 py-8 flex-1">
+    <div
+      className="min-h-screen"
+      style={{
+        backgroundImage: bgImages.length ? `url(${bgImages[bgIndex % bgImages.length]})` : undefined,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}
+    >
+      <div className="min-h-screen flex flex-col bg-white/50">
+        <div className="max-w-6xl mx-auto px-4 py-8 flex-1">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center mb-4">
@@ -179,8 +202,9 @@ export const DownloadPage: React.FC = () => {
             </div>
           </div>
         </div>
+        </div>
+        <div className="w-full border-t border-gray-200 py-4 text-center text-xs text-gray-500">© 2025 ViewNet, Inc.</div>
       </div>
-      <div className="w-full border-t border-gray-200 py-4 text-center text-xs text-gray-500">© 2025 ViewNet, Inc.</div>
     </div>
   )
 }
