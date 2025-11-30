@@ -1,5 +1,5 @@
 import React from 'react'
-import { Download } from 'lucide-react'
+import { Download, Apple, Laptop, Smartphone } from 'lucide-react'
 import { FileItem } from '../types'
 import { DownloadManager } from '../utils/downloadUtils'
 
@@ -49,7 +49,12 @@ export const FileList: React.FC<FileListProps> = ({ files, onDownloadStart }) =>
                   return (
                     <>
                       {label && (
-                        <span className={`inline-flex items-center px-2 py-0.5 text-xs rounded ${color}`}>{label}</span>
+                        <span className={`inline-flex items-center px-2 py-0.5 text-xs rounded ${color}`}>
+                          {platform === 'macos' && <Apple className="h-3 w-3 mr-1" />}
+                          {platform === 'windows' && <Laptop className="h-3 w-3 mr-1" />}
+                          {platform === 'android' && <Smartphone className="h-3 w-3 mr-1" />}
+                          {label}
+                        </span>
                       )}
                       {arch && (
                         <span className={`inline-flex items-center px-2 py-0.5 text-xs rounded ${arch === 'Apple M CPU' ? 'text-purple-700 bg-purple-50' : 'text-gray-700 bg-gray-100'}`}>{arch}</span>
