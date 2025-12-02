@@ -76,11 +76,11 @@ export async function onRequest({ request, env }: { request: Request; env: { BUC
       const toDelete: string[] = []
       for (const [, arr] of groups) {
         const withVer = arr.filter(x => Array.isArray(x.ver))
-        if (withVer.length <= retain) continue
+        if (withVer.length === 0) continue
         withVer.sort((a, b) => compareVersions(a.ver!, b.ver!))
         const keep = withVer.slice(-retain)
         const keepKeys = new Set(keep.map(k => k.key))
-        for (const item of withVer) {
+        for (const item of arr) {
           if (!keepKeys.has(item.key)) toDelete.push(item.key)
         }
       }
