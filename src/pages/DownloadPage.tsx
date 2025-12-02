@@ -104,29 +104,29 @@ export const DownloadPage: React.FC = () => {
                   const macFiles = files.filter(f => DownloadManager.categorizePlatform(f.path || f.name) === 'macos')
                   const winFiles = files.filter(f => DownloadManager.categorizePlatform(f.path || f.name) === 'windows')
                   const androidFiles = files.filter(f => DownloadManager.categorizePlatform(f.path || f.name) === 'android')
-                  const baseBtn = 'px-3 py-1.5 text-xs sm:text-sm sm:px-5 sm:py-2 font-medium rounded-full transition focus:outline-none focus:ring-2 focus:ring-offset-2 inline-flex items-center gap-2'
+                  const baseBtn = 'px-3 py-1 text-xs sm:text-sm sm:px-5 sm:py-2 font-medium rounded-full transition focus:outline-none focus:ring-2 focus:ring-offset-2 inline-flex items-center gap-1.5 sm:gap-2 whitespace-nowrap'
                   return (
                     <div className="flex items-center justify-center">
-                      <div className="bg-white/80 backdrop-blur-sm rounded-full p-1 border border-gray-200 flex flex-wrap gap-1 justify-center w-full sm:w-auto">
+                      <div className="bg-white/80 backdrop-blur-sm rounded-full p-0.5 sm:p-1 border border-gray-200 flex flex-wrap gap-0.5 sm:gap-1 justify-center w-full sm:w-auto">
                         <button
                           onClick={() => setActivePlatform('macos')}
                           className={`${baseBtn} ${activePlatform === 'macos' ? 'bg-blue-600 text-white ring-blue-500' : 'bg-white text-gray-700 hover:bg-gray-100'}`}
                         >
-                          <Apple className="h-4 w-4" />
+                          <Apple className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                           macOS ({macFiles.length})
                         </button>
                         <button
                           onClick={() => setActivePlatform('windows')}
                           className={`${baseBtn} ${activePlatform === 'windows' ? 'bg-blue-600 text-white ring-blue-500' : 'bg-white text-gray-700 hover:bg-gray-100'}`}
                         >
-                          <Laptop className="h-4 w-4" />
+                          <Laptop className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                           Windows ({winFiles.length})
                         </button>
                         <button
                           onClick={() => setActivePlatform('android')}
                           className={`${baseBtn} ${activePlatform === 'android' ? 'bg-blue-600 text-white ring-blue-500' : 'bg-white text-gray-700 hover:bg-gray-100'}`}
                         >
-                          <Smartphone className="h-4 w-4" />
+                          <Smartphone className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                           Android ({androidFiles.length})
                         </button>
                       </div>
@@ -162,16 +162,16 @@ export const DownloadPage: React.FC = () => {
                     return (
                       <div className="space-y-4">
                         <div className="flex items-center justify-center">
-                          <div className="bg-gray-50 rounded-full p-1 border border-gray-200 flex flex-wrap gap-1 justify-center w-full sm:w-auto">
+                          <div className="bg-gray-50 rounded-full p-0.5 sm:p-1 border border-gray-200 flex flex-wrap gap-0.5 sm:gap-1 justify-center w-full sm:w-auto">
                             <button
                               onClick={() => setMacSub('apple')}
-                              className={`px-4 py-1.5 text-xs sm:text-sm font-medium rounded-full inline-flex items-center gap-2 ${macSub === 'apple' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100'}`}
+                              className={`px-3 py-1 text-xs sm:text-sm sm:px-5 sm:py-2 font-medium rounded-full inline-flex items-center gap-1.5 sm:gap-2 whitespace-nowrap ${macSub === 'apple' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100'}`}
                             >
                               <Apple className="h-3.5 w-3.5" /> Apple M CPU ({appleCount})
                             </button>
                             <button
                               onClick={() => setMacSub('intel')}
-                              className={`px-4 py-1.5 text-xs sm:text-sm font-medium rounded-full inline-flex items-center gap-2 ${macSub === 'intel' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100'}`}
+                              className={`px-3 py-1 text-xs sm:text-sm sm:px-5 sm:py-2 font-medium rounded-full inline-flex items-center gap-1.5 sm:gap-2 whitespace-nowrap ${macSub === 'intel' ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100'}`}
                             >
                               <Cpu className="h-3.5 w-3.5" /> Intel CPU ({intelCount})
                             </button>
