@@ -26,9 +26,21 @@ export async function onRequest({ request, env }: { request: Request; env: { BUC
 
     if (prune) {
       const parseVersion = (name: string): number[] | null => {
-        const m = name.toLowerCase().match(/(?:v)?(\d+(?:\.\d+)+)/)
-        if (!m) return null
-        return m[1].split('.').map(n => parseInt(n, 10))
+        const s = name.toLowerCase()
+        // 1) dotted semantic versions: v1.2.3, 1.2.3
+        const dotted = s.match(/(?:v|rev|version)?\s*(\d+(?:\.\d+)+)/)
+        if (dotted) return dotted[1].split('.').map(n => parseInt(n, 10))
+        // 2) date/time stamps: 20241201 or 20241201123045
+        const date = s.match(/(20\d{2})(\d{2})(\d{2})(?:[^\d]*(\d{2})(\d{2})(\d{2}))?/)
+        if (date) {
+          const arr: number[] = [Number(date[1]), Number(date[2]), Number(date[3])]
+          if (date[4]) arr.push(Number(date[4]), Number(date[5]), Number(date[6]))
+          return arr
+        }
+        // 3) plain build numbers: take the last long digit sequence (>=3)
+        const nums = s.match(/\d{3,}/g)
+        if (nums && nums.length) return [parseInt(nums[nums.length - 1], 10)]
+        return null
       }
       const compareVersions = (a: number[], b: number[]): number => {
         const len = Math.max(a.length, b.length)
@@ -42,7 +54,12 @@ export async function onRequest({ request, env }: { request: Request; env: { BUC
       const normalizeName = (name: string): string => {
         return name
           .toLowerCase()
-          .replace(/(?:v)?\d+(?:\.\d+)+/g, '')
+          // remove semantic version like v1.2.3 or 1.2.3
+          .replace(/(?:v|rev|version)?\s*\d+(?:\.\d+)+/g, '')
+          // remove date/time stamps like 20241201 or 20241201123045
+          .replace(/20\d{6}(?:\d{6})?/g, '')
+          // remove long numeric sequences (likely build numbers)
+          .replace(/\d{3,}/g, '')
           .replace(/[-_.]+/g, ' ')
           .trim()
       }
