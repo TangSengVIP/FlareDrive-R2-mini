@@ -28,6 +28,20 @@ export const DownloadPage: React.FC = () => {
         }
       } catch (err) { console.warn('bing images load failed', err) }
     })()
+    ;(async () => {
+      try {
+        const shouldPrune = (import.meta.env.VITE_PRUNE_ON_LOAD as string | undefined) === '1'
+        if (shouldPrune) {
+          const retain = import.meta.env.VITE_PRUNE_RETAIN as string | undefined
+          const prefix = import.meta.env.VITE_PRUNE_PREFIX as string | undefined
+          const u = new URL('/api/files', window.location.origin)
+          u.searchParams.set('prune', '1')
+          if (retain) u.searchParams.set('retain', retain)
+          if (prefix) u.searchParams.set('prefix', prefix)
+          await fetch(u.toString())
+        }
+      } catch (err) { console.warn('auto prune failed', err) }
+    })()
   }, [])
 
   const loadFiles = async () => {
